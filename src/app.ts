@@ -3,7 +3,6 @@ import cors from 'cors';
 import userRoutes from './routes/userRoutes';
 import dotenv from 'dotenv';
 
-// Charger les variables d'environnement depuis le fichier .env
 dotenv.config();
 
 const app = express();
