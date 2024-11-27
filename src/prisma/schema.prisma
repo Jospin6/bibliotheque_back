@@ -1,14 +1,67 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-generator client {
-  provider = "prisma-client-js"
+model User {
+  id            String         @id @default(uuid())
+  firstName     String
+  lastName      String
+  email         String         @unique
+  password      String
+  role          Role          @default(STUDENT)
+  isActive      Boolean        @default(true)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  documents     Document[]
+  consultations Consultation[]
+  faculty       Faculty?       @relation(fields: [facultyId], references: [id])
+  facultyId     String?
+
+  @@map("users")
 }
 
-model User {
-  id    Int     @id @default(autoincrement())
-  name  String
-  email String  @unique
+model Document {
+  id            String         @id @default(uuid())
+  title         String
+  author        String
+  filePath      String
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  user          User          @relation(fields: [userId], references: [id])
+  userId        String
+  consultations Consultation[]
+
+  @@map("documents")
+}
+
+model Consultation {
+  id         String   @id @default(uuid())
+  createdAt  DateTime @default(now())
+  user       User     @relation(fields: [userId], references: [id])
+  userId     String
+  document   Document @relation(fields: [documentId], references: [id])
+  documentId String
+
+  @@map("consultations")
+}
+
+model Faculty {
+  id        String   @id @default(uuid())
+  title     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  users     User[]
+
+  @@map("faculties")
+}
+
+enum Role {
+  ADMIN
+  TEACHER
+  STUDENT
 }
